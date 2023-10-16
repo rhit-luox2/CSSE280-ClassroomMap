@@ -10,3 +10,59 @@ body {
 .page-container {
     margin-top: 75px;
 }
+
+h1.text-center {
+    font-size: 2.2em;
+    font-weight: 500;
+    color: #5A0000;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #000;
+    font-size: 1.5em; 
+    margin-bottom: 1px; 
+    display: block;
+}
+
+.form-control.custom-dropdown {
+    border: none;
+    border-bottom: 1px solid #000;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+    height: auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.form-control.custom-dropdown:focus {
+    border-color: #000;
+    box-shadow: none;
+}
+
+.button-group {
+    text-align: center;
+    padding: 3vw 0;
+}
+
+.button-group > button {
+    font-size: 1.2em;
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #800000;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button-group > button:hover {
+    background-color: #800000; 
+}

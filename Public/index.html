@@ -12,11 +12,56 @@
 
 <body>
   <nav class="navbar navbar-dark fixed-top">
-    <a class="navbar-brand" href="#">Classroom Map</a>
+      <a class="navbar-brand" href="#">Classroom Map</a>
   </nav>
   <div id="mainPage" class="container page-container">
-
-
+      <div class="mt-5">
+          <h1 class="text-center">Classroom Maps</h1>
+          <div class="mt-4">
+            
+              <div class="row mb-3">
+                  <div class="col-2 d-flex align-items-center">
+                      <label for="fromLocation">From</label>
+                  </div>
+                  <div class="col-10">
+                      <div class="form-group">
+                          <select class="form-control" id="fromLocation">
+                              <!-- add <option> elements here for dropdown selection -->
+                                <option>O157</option>
+                                <option>O159</option>
+                                <option>O257</option>
+                                <option>O259</option>
+                                <option>J102</option>
+                                <option>J104</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="row">
+                  <div class="col-2 d-flex align-items-center">
+                      <label for="toLocation">To</label>
+                  </div>
+                  <div class="col-10">
+                      <div class="form-group">
+                          <select class="form-control" id="toLocation">
+                              <!-- add <option> elements here for dropdown selection -->
+                                <option>O157</option>
+                                <option>O159</option>
+                                <option>O257</option>
+                                <option>O259</option>
+                                <option>J102</option>
+                                <option>J104</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="button-group">
+                  <button id="SerchButton">Search</button>
+              </div>
+          </div>
+      </div>
   </div>
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>
