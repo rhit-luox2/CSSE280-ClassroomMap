@@ -8,6 +8,17 @@ function htmlToElement(html) {
 	return template.content.firstChild;
 }
 
+rhit.SideNavController = class {
+	constructor() {
+		const menuSignOutItem = document.querySelector("#menuSignOut");
+		if (menuSignOutItem) {
+			menuSignOutItem.addEventListener("click", (event) => {
+				rhit.fbAuthManager.signOut();
+			});
+		}
+	}
+}
+
 rhit.MainPageController = class {
     constructor() {
 
@@ -75,6 +86,8 @@ rhit.checkForRedirects = function () {
 };
 
 rhit.initializePage = function () {
+	const urlParams = new URLSearchParams(window.location.search);
+	new rhit.SideNavController();
 	if (document.querySelector("#mainPage")) {
 		console.log("On the main search page");
 		new rhit.MainPageController();
