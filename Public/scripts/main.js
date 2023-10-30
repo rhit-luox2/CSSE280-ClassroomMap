@@ -103,7 +103,12 @@ rhit.startFirebaseUI = function () {
 /* Main */
 /** function and class syntax examples */
 rhit.main = function () {
-    rhit.startFirebaseUI();
+    rhit.fbAuthManager = new rhit.FbAuthManager();
+	rhit.fbAuthManager.beginListening(() => {
+		rhit.checkForRedirects();
+		rhit.initializePage();
+	});
+	rhit.startFirebaseUI();
 };
 
 rhit.main();
