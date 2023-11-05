@@ -1,7 +1,15 @@
 const classrooms = {};
 
-window.onload = function() {
+document.getElementById('loadButton').addEventListener('click', loadSVG);
+document.getElementById('exportButton').addEventListener('click', exportData);
+
+function loadSVG() {
+    const selectedFloor = document.getElementById('floorSelect').value;
     const svgObject = document.getElementById('FloorMap');
+    
+    svgObject.data = selectedFloor; // Set the SVG data source
+    
+    // Add an event listener for the load event
     svgObject.addEventListener('load', function() {
         const svgDoc = svgObject.contentDocument;
         svgDoc.addEventListener('click', (event) => {
@@ -15,11 +23,6 @@ window.onload = function() {
             }
         });
     });
-};
-
-function loadSVG() {
-    const selectedFloor = document.getElementById('floorSelect').value;
-    document.getElementById('FloorMap').setAttribute('data', 'FloorMap/' + selectedFloor);
 }
 
 function exportData() {
@@ -31,3 +34,4 @@ function exportData() {
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
+
