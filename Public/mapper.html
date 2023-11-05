@@ -10,14 +10,31 @@
     <label for="floorSelect">Select Floor Plan: </label>
     <select id="floorSelect">
         <!-- Assuming you have three floor plans as an example. Adjust accordingly. -->
-        <option value="floor1.svg">Floor 1</option>
-        <option value="floor2.svg">Floor 2</option>
-        <option value="floor3.svg">Floor 3</option>
+        <option value="Public/FloorMap/Crapo_1.svg">Crapo 1</option>
+        <option value="Public/FloorMap/Crapo_2.svg">Crapo 2</option>
+        <option value="Public/FloorMap/Crapo_3.svg">Crapo 3</option>
+        <option value="Public/FloorMap/Hadley_1.svg">Hadley 1</option>
+        <option value="Public/FloorMap/Hadley_2.svg">Hadley 2</option>
+        <option value="Public/FloorMap/Moench_1.svg">Moench 1</option>
+        <option value="Public/FloorMap/Moench_2.svg">Moench 2</option>
+        <option value="Public/FloorMap/Moench_3.svg">Moench 3</option>
+        <option value="Public/FloorMap/Moench_LL1.svg">Moench LL1</option>
+        <option value="Public/FloorMap/Moench_LL2.svg">Moench LL2</option>
+        <option value="Public/FloorMap/Myers_1.svg">Myers 1</option>
+        <option value="Public/FloorMap/Myers_2.svg">Myers 2</option>
+        <option value="Public/FloorMap/NAB_1.svg">NAB 1</option>
+        <option value="Public/FloorMap/NAB_2.svg">NAB 2</option>
+        <option value="Public/FloorMap/NAB_3.svg">NAB 3</option>
+        <option value="Public/FloorMap/Olin_1.svg">Olin 1</option>
+        <option value="Public/FloorMap/Olin_2.svg">Olin 2</option>
+        <option value="Public/FloorMap/OlinAL_1.svg">Olin AL1</option>
+        <option value="Public/FloorMap/OlinAL_2.svg">Olin AL2</option>
+
     </select>
     <button onclick="loadSVG()">Load Floor Plan</button>
     
     <!-- The SVG will be loaded into this object element -->
-    <object id="floorPlan" type="image/svg+xml" data="">Your browser does not support SVGs</object>
+    <object id="FloorMap" type="image/svg+xml" data="">Your browser does not support SVGs</object>
 
     <!-- Button to export data -->
     <button onclick="exportData()">Export Data</button>

@@ -1,7 +1,7 @@
 const classrooms = {};
 
 window.onload = function() {
-    const svgObject = document.getElementById('floorPlan');
+    const svgObject = document.getElementById('FloorMap');
     svgObject.addEventListener('load', function() {
         const svgDoc = svgObject.contentDocument;
         svgDoc.addEventListener('click', (event) => {
@@ -19,7 +19,7 @@ window.onload = function() {
 
 function loadSVG() {
     const selectedFloor = document.getElementById('floorSelect').value;
-    document.getElementById('floorPlan').setAttribute('data', 'FloorPlan/' + selectedFloor);
+    document.getElementById('FloorMap').setAttribute('data', 'FloorMap/' + selectedFloor);
 }
 
 function exportData() {
