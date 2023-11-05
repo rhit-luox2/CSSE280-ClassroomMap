@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Mapper</title>
+</head>
+<body>
+    <!-- Allow user to select which SVG/floor plan they want to map -->
+    <label for="floorSelect">Select Floor Plan: </label>
+    <select id="floorSelect">
+        <!-- Assuming you have three floor plans as an example. Adjust accordingly. -->
+        <option value="floor1.svg">Floor 1</option>
+        <option value="floor2.svg">Floor 2</option>
+        <option value="floor3.svg">Floor 3</option>
+    </select>
+    <button onclick="loadSVG()">Load Floor Plan</button>
+    
+    <!-- The SVG will be loaded into this object element -->
+    <object id="floorPlan" type="image/svg+xml" data="">Your browser does not support SVGs</object>
+
+    <!-- Button to export data -->
+    <button onclick="exportData()">Export Data</button>
+
+    <script src="mapper.js"></script>
+</body>
+</html>
