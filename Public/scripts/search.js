@@ -78,7 +78,6 @@ $(document).ready(function() {
     });
 });
 
-
 let mapData = {
     floor1: {
         classrooms: null,
@@ -94,6 +93,26 @@ let mapData = {
 
 let currentFloor = 1;
 
+function loadJSONData() {
+    let promises = [];
+
+    ['floor1', 'floor2'].forEach(floor => {
+        promises.push(
+            $.getJSON(`/assets/${floor}_classrooms.json`, function(data) {
+                mapData[floor].classrooms = data;
+            }),
+            $.getJSON(`/assets/${floor}_path.json`, function(data) {
+                mapData[floor].paths = data;
+            }),
+            $.getJSON(`/assets/${floor}_stairs.json`, function(data) {
+                mapData[floor].stairs = data;
+            })
+        );
+    });
+
+    return Promise.all(promises);
+}
+
 function loadSVG(floorNumber) {
     currentFloor = floorNumber;
     $("#svgContainer").load(`/AllFloorMap/floor_${floorNumber}.svg`, function(response, status, xhr) {
@@ -101,9 +120,59 @@ function loadSVG(floorNumber) {
             console.error("Failed to load the SVG: ", xhr.status, xhr.statusText);
         } else {
             // SVG loaded successfully
+            addClickEventListenerToSVG();
         }
     });
 }
+
+function addClickEventListenerToSVG() {
+    let svgElement = $('#svgContainer').find('svg').get(0);
+    if (svgElement) {
+        svgElement.addEventListener('click', function(event) {
+            let point = getSVGPoint(event, svgElement);
+            let jsonCoords = svgToJSONCoordinates(point.x, point.y);
+            console.log(`SVG Click Coordinates: X=${point.x}, Y=${point.y}`);
+            console.log(`JSON Coordinates: X=${jsonCoords.x}, Y=${jsonCoords.y}`);
+        });
+    }
+}
+
+function getSVGPoint(event, svgElement) {
+    let point = svgElement.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    point = point.matrixTransform(svgElement.getScreenCTM().inverse());
+    return point; // This point is in the SVG coordinate system
+}
+
+const jsonReference = { x: 1122, y: 389 };
+const svgReference = { x: 2042, y: 712 };
+
+const scaleX = svgReference.x / jsonReference.x;
+const scaleY = svgReference.y / jsonReference.y;
+const translateX = svgReference.x - (jsonReference.x * scaleX);
+const translateY = svgReference.y - (jsonReference.y * scaleY);
+
+function svgToJSONCoordinates(svgX, svgY) {
+    // Given JSON coordinates (108, 705) map to SVG coordinates (329, 1285)
+    const jsonReference = { x: 1122, y: 389 };
+    const svgReference = { x: 2042, y: 712 };
+
+    // Calculate scale factors
+    const scaleX = svgReference.x / jsonReference.x;
+    const scaleY = svgReference.y / jsonReference.y;
+
+    // Calculate translation factors
+    const translateX = svgReference.x - (jsonReference.x * scaleX);
+    const translateY = svgReference.y - (jsonReference.y * scaleY);
+
+    // Apply reverse transformation to get JSON coordinates from SVG coordinates
+    let jsonX = (svgX - translateX) / scaleX;
+    let jsonY = (svgY - translateY) / scaleY;
+
+    return { x: jsonX, y: jsonY };
+}
+
 
 function getDistance(point1, point2) {
     return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
@@ -137,7 +206,7 @@ function findPathBetweenNodes(startNode, endNode, grid) {
 }
 
 function findCompleteRoute(classroomA, classroomB, paths) {
-    let grid = setupGrid(1000, 1000, paths);
+    let grid = setupGrid(1500,1500,paths);
 
     let startPathNode = getClosestPathNode(classroomA, paths);
     let endPathNode = getClosestPathNode(classroomB, paths);
@@ -186,15 +255,32 @@ function drawSVGRoute(route, svgContainerId) {
         return;
     }
 
-    let pathData = routeToSVGPath(route);
+    // Clear any existing paths
+    clearSVGPaths(svgContainerId);
 
-    let pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    pathElement.setAttribute("d", pathData);
-    pathElement.setAttribute("stroke", "blue");
-    pathElement.setAttribute("fill", "none");
-    pathElement.setAttribute("stroke-width", "2");
+    // Transform the route coordinates
+    let transformedRoute = route.map(point => {
+        return {
+            x: point[0] * scaleX + translateX,
+            y: point[1] * scaleY + translateY
+        };
+    });
 
-    svgElement.appendChild(pathElement);
+    // Generate the SVG path data using the transformed route
+    let pathData = "M" + transformedRoute[0].x + "," + transformedRoute[0].y;
+    for (let i = 1; i < transformedRoute.length; i++) {
+        pathData += " L" + transformedRoute[i].x + "," + transformedRoute[i].y;
+    }
+
+    // Create the new path element
+    let newPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    newPath.setAttribute('d', pathData);
+    newPath.setAttribute('stroke', 'red');
+    newPath.setAttribute('fill', 'none');
+    newPath.setAttribute('stroke-width', '6');
+
+    // Append the new path to the SVG element
+    svgElement.appendChild(newPath);
 }
 
 
@@ -216,6 +302,3 @@ function clearSVGPaths(svgContainerId) {
         paths[0].parentNode.removeChild(paths[0]);
     }
 }
-
-
-
