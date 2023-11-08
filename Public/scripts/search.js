@@ -120,29 +120,8 @@ function loadSVG(floorNumber) {
             console.error("Failed to load the SVG: ", xhr.status, xhr.statusText);
         } else {
             // SVG loaded successfully
-            addClickEventListenerToSVG();
         }
     });
-}
-
-function addClickEventListenerToSVG() {
-    let svgElement = $('#svgContainer').find('svg').get(0);
-    if (svgElement) {
-        svgElement.addEventListener('click', function(event) {
-            let point = getSVGPoint(event, svgElement);
-            let jsonCoords = svgToJSONCoordinates(point.x, point.y);
-            console.log(`SVG Click Coordinates: X=${point.x}, Y=${point.y}`);
-            console.log(`JSON Coordinates: X=${jsonCoords.x}, Y=${jsonCoords.y}`);
-        });
-    }
-}
-
-function getSVGPoint(event, svgElement) {
-    let point = svgElement.createSVGPoint();
-    point.x = event.clientX;
-    point.y = event.clientY;
-    point = point.matrixTransform(svgElement.getScreenCTM().inverse());
-    return point; // This point is in the SVG coordinate system
 }
 
 const jsonReference = { x: 1122, y: 389 };
@@ -152,27 +131,6 @@ const scaleX = svgReference.x / jsonReference.x;
 const scaleY = svgReference.y / jsonReference.y;
 const translateX = svgReference.x - (jsonReference.x * scaleX);
 const translateY = svgReference.y - (jsonReference.y * scaleY);
-
-function svgToJSONCoordinates(svgX, svgY) {
-    // Given JSON coordinates (108, 705) map to SVG coordinates (329, 1285)
-    const jsonReference = { x: 1122, y: 389 };
-    const svgReference = { x: 2042, y: 712 };
-
-    // Calculate scale factors
-    const scaleX = svgReference.x / jsonReference.x;
-    const scaleY = svgReference.y / jsonReference.y;
-
-    // Calculate translation factors
-    const translateX = svgReference.x - (jsonReference.x * scaleX);
-    const translateY = svgReference.y - (jsonReference.y * scaleY);
-
-    // Apply reverse transformation to get JSON coordinates from SVG coordinates
-    let jsonX = (svgX - translateX) / scaleX;
-    let jsonY = (svgY - translateY) / scaleY;
-
-    return { x: jsonX, y: jsonY };
-}
-
 
 function getDistance(point1, point2) {
     return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
