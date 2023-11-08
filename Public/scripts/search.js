@@ -1,93 +1,15 @@
-function loadJSONData() {
-    let promises = [];
-
-    ['floor1', 'floor2'].forEach(floor => {
-        promises.push(
-            $.getJSON(`/assets/${floor}_classrooms.json`, function(data) {
-                mapData[floor].classrooms = data;
-            }),
-            $.getJSON(`/assets/${floor}_path.json`, function(data) {
-                mapData[floor].paths = data;
-            }),
-            $.getJSON(`/assets/${floor}_stairs.json`, function(data) {
-                mapData[floor].stairs = data;
-            })
-        );
-    });
-
-    return Promise.all(promises);
-}
-
-$(document).ready(function() {
-    loadSVG(1);
-    
-    loadJSONData().then(() => {
-        console.log('All JSON data has been loaded.');
-    }).catch(error => {
-        console.error('Error loading JSON data:', error);
-    });
-
-    $('#fromLocation, #toLocation').change(function() {
-        let selectedClassroom = $(this).val();
-        let floorNumber = (selectedClassroom.startsWith('O2') || selectedClassroom.startsWith('J1')) ? 2 : 1;
-        loadSVG(floorNumber);
-    });
-
-    $("#SearchButton").click(function() {
-        let fromLocation = $("#fromLocation").val();
-        let toLocation = $("#toLocation").val();
-
-        console.log('From location:', fromLocation);
-        console.log('To location:', toLocation);
-        console.log('Current floor:', currentFloor);
-
-        let classrooms = mapData[`floor${currentFloor}`].classrooms;
-        let paths = mapData[`floor${currentFloor}`].paths;
-
-        console.log('Classrooms data:', classrooms);
-        console.log('Paths data:', paths);
-
-        let classroomA = classrooms[fromLocation];
-        let classroomB = classrooms[toLocation];
-
-        console.log('classroomA:', classroomA);
-        console.log('classroomB:', classroomB);
-
-        if (!classroomA || !classroomB) {
-            console.error('One of the classroom details is undefined.');
-            return;
-        }
-
-        let route = findCompleteRoute(classroomA, classroomB, paths);
-
-        if (route) {
-            clearSVGPaths("yourSVGElementId");
-            drawSVGRoute(route, "yourSVGElementId");
-        } else {
-            console.error('No route found.');
-        }
-
-        let svgContainer = document.getElementById('svgContainer');
-        if (svgContainer && svgContainer.querySelector('svg')) {
-            clearSVGPaths("svgContainer");
-            drawSVGRoute(route, "svgContainer");
-        } else {
-            console.error("SVG is not loaded yet.");
-        }
-
-    });
-});
-
 let mapData = {
     floor1: {
         classrooms: null,
         paths: null,
-        stairs: null
+        stairs: null,
+        walls: null
     },
     floor2: {
         classrooms: null,
         paths: null,
-        stairs: null
+        stairs: null,
+        walls: null
     }
 };
 
@@ -97,21 +19,30 @@ function loadJSONData() {
     let promises = [];
 
     ['floor1', 'floor2'].forEach(floor => {
-        promises.push(
-            $.getJSON(`/assets/${floor}_classrooms.json`, function(data) {
-                mapData[floor].classrooms = data;
-            }),
-            $.getJSON(`/assets/${floor}_path.json`, function(data) {
-                mapData[floor].paths = data;
-            }),
-            $.getJSON(`/assets/${floor}_stairs.json`, function(data) {
-                mapData[floor].stairs = data;
-            })
-        );
+        // Load classroom data
+        promises.push($.getJSON(`/assets/${floor}_classrooms.json`).then(data => {
+            mapData[floor].classrooms = data;
+        }));
+
+        // Load path data
+        promises.push($.getJSON(`/assets/${floor}_path.json`).then(data => {
+            mapData[floor].paths = data;
+        }));
+
+        // Load stairs data
+        promises.push($.getJSON(`/assets/${floor}_stairs.json`).then(data => {
+            mapData[floor].stairs = data;
+        }));
+
+        // Load walls data
+        promises.push($.getJSON(`/assets/${floor}_walls.json`).then(data => {
+            mapData[floor].walls = data.walls; // Make sure your JSON structure has a "walls" key
+        }));
     });
 
     return Promise.all(promises);
 }
+
 
 function loadSVG(floorNumber) {
     currentFloor = floorNumber;
@@ -152,10 +83,59 @@ function getClosestPathNode(classroom, paths) {
     return closestPath;
 }
 
-function setupGrid(width, height, paths) {
+function setupGrid(width, height, paths, walls) {
     let grid = new PF.Grid(width, height);
-    // Additional code might be needed here to set non-walkable areas based on the floor plan.
+
+    // Check if walls data is defined and is an array before attempting to use it
+    if (Array.isArray(walls)) {
+        walls.forEach(wall => {
+            let points = getLinePoints(wall.start, wall.end);
+            points.forEach(point => {
+                grid.setWalkableAt(point.x, point.y, false);
+            });
+        });
+    } else {
+        console.error('Walls data is not loaded or not an array:', walls);
+    }
+
     return grid;
+}
+
+
+// Implement Bresenham's line algorithm (or another line-drawing algorithm)
+// to get all the points on a line from start to end
+function getLinePoints(start, end) {
+    let points = [];
+
+    let x0 = start.x;
+    let y0 = start.y;
+    const x1 = end.x;
+    const y1 = end.y;
+
+    const dx = Math.abs(x1 - x0);
+    const dy = -Math.abs(y1 - y0);
+
+    const sx = (x0 < x1) ? 1 : -1;
+    const sy = (y0 < y1) ? 1 : -1;
+
+    let err = dx + dy;
+    let e2;
+
+    while (true) {
+        points.push({ x: x0, y: y0 });
+        if (x0 === x1 && y0 === y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) {
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+
+    return points;
 }
 
 function findPathBetweenNodes(startNode, endNode, grid) {
@@ -163,8 +143,8 @@ function findPathBetweenNodes(startNode, endNode, grid) {
     return finder.findPath(startNode.x, startNode.y, endNode.x, endNode.y, grid.clone());
 }
 
-function findCompleteRoute(classroomA, classroomB, paths) {
-    let grid = setupGrid(1500,1500,paths);
+function findCompleteRoute(classroomA, classroomB, paths,walls) {
+    let grid = setupGrid(1500,1500,paths,walls);
 
     let startPathNode = getClosestPathNode(classroomA, paths);
     let endPathNode = getClosestPathNode(classroomB, paths);
@@ -260,3 +240,70 @@ function clearSVGPaths(svgContainerId) {
         paths[0].parentNode.removeChild(paths[0]);
     }
 }
+
+$(document).ready(function() {
+    loadSVG(1);
+    
+    loadJSONData().then(() => {
+        console.log('All JSON data has been loaded.');
+        // Now that data is loaded, you can enable the search button
+        $('#SearchButton').prop('disabled', false);
+    }).catch(error => {
+        console.error('Error loading JSON data:', error);
+    });
+
+    $('#fromLocation, #toLocation').change(function() {
+        let selectedClassroom = $(this).val();
+        let floorNumber = (selectedClassroom.startsWith('O2') || selectedClassroom.startsWith('J1')) ? 2 : 1;
+        loadSVG(floorNumber);
+    });
+
+    $("#SearchButton").click(function() {
+        let fromLocation = $("#fromLocation").val();
+        let toLocation = $("#toLocation").val();
+
+        console.log('From location:', fromLocation);
+        console.log('To location:', toLocation);
+        console.log('Current floor:', currentFloor);
+
+        let classrooms = mapData[`floor${currentFloor}`].classrooms;
+        let paths = mapData[`floor${currentFloor}`].paths;
+
+        console.log('Classrooms data:', classrooms);
+        console.log('Paths data:', paths);
+
+        let classroomA = classrooms[fromLocation];
+        let classroomB = classrooms[toLocation];
+
+        console.log('classroomA:', classroomA);
+        console.log('classroomB:', classroomB);
+
+        if (!classroomA || !classroomB) {
+            console.error('One of the classroom details is undefined.');
+            return;
+        }
+
+        let walls = mapData[`floor${currentFloor}`].walls;
+        if (!Array.isArray(walls)) {
+            console.error(`Walls data is not loaded for floor ${currentFloor}`);
+            return; // Exit early if walls data isn't loaded
+        }
+        let route = findCompleteRoute(classroomA, classroomB, paths, walls);
+
+        if (route) {
+            clearSVGPaths("yourSVGElementId");
+            drawSVGRoute(route, "yourSVGElementId");
+        } else {
+            console.error('No route found.');
+        }
+
+        let svgContainer = document.getElementById('svgContainer');
+        if (svgContainer && svgContainer.querySelector('svg')) {
+            clearSVGPaths("svgContainer");
+            drawSVGRoute(route, "svgContainer");
+        } else {
+            console.error("SVG is not loaded yet.");
+        }
+
+    });
+});

@@ -1,4 +1,5 @@
-const classrooms = {};
+const walls = [];
+let tempWallStart = null;
 
 document.getElementById('loadButton').addEventListener('click', loadSVG);
 document.getElementById('exportButton').addEventListener('click', exportData);
@@ -10,25 +11,33 @@ function loadSVG() {
     svgObject.addEventListener('load', function() {
         const svgDoc = svgObject.contentDocument;
         svgDoc.addEventListener('click', (event) => {
-            const className = prompt("Enter the classroom name/number:");
-            if (className) {
-                classrooms[className] = {
+            if (!tempWallStart) {
+                tempWallStart = {
                     x: event.clientX,
                     y: event.clientY
                 };
-                console.log('Stored:', className, 'at', classrooms[className]);
+                alert('Start point of the wall set. Click the end point of the wall.');
+            } else {
+                const wallEnd = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+                walls.push({ start: tempWallStart, end: wallEnd });
+                tempWallStart = null; // Reset for the next wall
+                console.log('Stored wall:', walls[walls.length - 1]);
             }
         });
     });
 }
 
 function exportData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(classrooms));
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ walls }));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "classrooms.json");
+    downloadAnchorNode.setAttribute("download", "walls.json");
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
+
 
