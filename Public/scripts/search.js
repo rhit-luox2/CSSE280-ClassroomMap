@@ -266,7 +266,18 @@ $(document).ready(function() {
 
     $('#fromLocation, #toLocation').change(function() {
         let selectedClassroom = $(this).val();
-        let floorNumber = (selectedClassroom.startsWith('O2') || selectedClassroom.startsWith('J1')) ? 2 : 1;
+    
+        let floorNumber;
+        if (selectedClassroom.startsWith('G2')) {
+            floorNumber = 1; // G2 classrooms are on the first floor
+        } else if (selectedClassroom.match(/^[A-FH-Z]2/)) {
+            floorNumber = 2; // Classrooms starting with any letter except 'G', followed by '2', are on the second floor
+        } else if (selectedClassroom.startsWith('G3')) {
+            floorNumber = 2; // G3 classrooms are on the second floor
+        } else {
+            floorNumber = 1; // Default to the first floor for any other case
+        }
+    
         loadSVG(floorNumber);
     });
 
