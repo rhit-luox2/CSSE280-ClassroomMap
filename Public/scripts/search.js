@@ -193,7 +193,7 @@ function drawSVGRoute(route, svgContainerId) {
         return;
     }
 
-    // Clear any existing paths
+    // Clear any existing paths and circles
     clearSVGPaths(svgContainerId);
 
     // Transform the route coordinates
@@ -213,14 +213,27 @@ function drawSVGRoute(route, svgContainerId) {
     // Create the new path element
     let newPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     newPath.setAttribute('d', pathData);
-    newPath.setAttribute('stroke', 'red');
+    newPath.setAttribute('stroke', 'blue');
     newPath.setAttribute('fill', 'none');
     newPath.setAttribute('stroke-width', '6');
-
-    // Append the new path to the SVG element
     svgElement.appendChild(newPath);
-}
 
+    // Create the start circle
+    let startCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    startCircle.setAttribute('cx', transformedRoute[0].x);
+    startCircle.setAttribute('cy', transformedRoute[0].y);
+    startCircle.setAttribute('r', '15'); // radius of the circle
+    startCircle.setAttribute('fill', 'red');
+    svgElement.appendChild(startCircle);
+
+    // Create the end circle
+    let endCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    endCircle.setAttribute('cx', transformedRoute[transformedRoute.length - 1].x);
+    endCircle.setAttribute('cy', transformedRoute[transformedRoute.length - 1].y);
+    endCircle.setAttribute('r', '15'); // radius of the circle
+    endCircle.setAttribute('fill', 'green');
+    svgElement.appendChild(endCircle);
+}
 
 function clearSVGPaths(svgContainerId) {
     let svgContainer = document.getElementById(svgContainerId);
@@ -235,10 +248,9 @@ function clearSVGPaths(svgContainerId) {
         return;
     }
 
-    let paths = svgElement.getElementsByTagName("path");
-    while (paths.length > 0) {
-        paths[0].parentNode.removeChild(paths[0]);
-    }
+    // Remove paths and circles
+    let elementsToRemove = svgElement.querySelectorAll('path, circle');
+    elementsToRemove.forEach(el => el.remove());
 }
 
 $(document).ready(function() {
