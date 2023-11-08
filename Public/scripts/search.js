@@ -280,7 +280,7 @@ $(document).ready(function() {
     
         loadSVG(floorNumber);
     });
-
+    
     $("#SearchButton").click(function() {
         let fromLocation = $("#fromLocation").val();
         let toLocation = $("#toLocation").val();
