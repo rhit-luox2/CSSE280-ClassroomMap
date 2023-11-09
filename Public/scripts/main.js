@@ -16,6 +16,12 @@ rhit.SideNavController = class {
 				rhit.fbAuthManager.signOut();
 			});
 		}
+		const menuInstructionsItem = document.querySelector("#menuInstructions");
+        if (menuInstructionsItem) {
+            menuInstructionsItem.addEventListener("click", (event) => {
+                console.log("Instructions button clicked");
+            });
+        }
 	}
 }
 
@@ -66,6 +72,7 @@ rhit.FbAuthManager = class {
 	signOut() {
 		firebase.auth().signOut().catch((error) => {
 			console.log("Sign out error");
+			window.location.href = "/login.html";
 		});
 	}
 	get isSignedIn() {

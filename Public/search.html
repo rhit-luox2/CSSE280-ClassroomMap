@@ -27,6 +27,7 @@
             </header>
             <ul class="list-group">
                 <a id="menuSignOut" class="list-group-item"><i class="material-icons">logout</i>Sign out</a>
+                <a id="menuInstructions" class="list-group-item" href="instruction/info.pdf"><i class="material-icons">description</i>Instructions</a>
             </ul>
         </div>
         <div id="mainPage" class="container page-container">
@@ -364,16 +365,23 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="scripts/pathfinding-browser.min.js"></script>
-    <script src="scripts/jquery.min.js"></script>
-    <script src="scripts/popper.js"></script>
-    <script src="scripts/bootstrap-material-design.js"></script>
+
     <script src="/__/firebase/7.18.0/firebase-app.js"></script>
     <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
     <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
     <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
     <script src="/__/firebase/init.js"></script>
+    <script src="scripts/pathfinding-browser.min.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/popper.js"></script>
+    <script src="scripts/bootstrap-material-design.js"></script>
     <script src="scripts/search.js"></script>
+    <script src="scripts/main.js"></script>
+
+    <script>
+        $("body").bootstrapMaterialDesign();
+    </script>
+
 </body>
 
 </html>
